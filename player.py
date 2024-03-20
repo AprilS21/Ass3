@@ -145,7 +145,7 @@ class SmartComputerPlayerPruning(Player):
 from typing import Dict, List
 import numpy as np
 class Qlearning(Player):
-    def __init__(self, letter, alpha=0.9, gamma=0.95, q_init=0.6):
+    def __init__(self, letter, qtable = None, alpha=0.9, gamma=0.95, q_init=0.6):
         """
         Called when creating a new TQPlayer. Accepts some optional parameters to define its learning behaviour
         :param alpha: The learning rate needs to be larger than 0 and smaller than 1
@@ -154,7 +154,7 @@ class Qlearning(Player):
         :param q_init: The initial q values for each move and state.
         """
         self.side = None
-        self.qtable = {}
+        self.qtable = qtable if qtable is not None else {}
         self.learning_rate = alpha
         self.value_discount = gamma
         self.q_init_val = q_init
