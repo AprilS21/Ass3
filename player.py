@@ -154,8 +154,7 @@ class Qlearning(Player):
         :param q_init: The initial q values for each move and state.
         """
         self.side = None
-        self.qtable = {}  # type: Dict[int, np.ndarray]
-        self.move_history = []  # type: List[(int, int)]
+        self.qtable = {}
         self.learning_rate = alpha
         self.value_discount = gamma
         self.q_init_val = q_init
@@ -209,6 +208,13 @@ class Qlearning(Player):
             x = random.choice(possible_moves)   # Random choice
         else:  # Exploit our qtable
             x = self.keywithmaxval(self.qtable[self.current_state])  # Optimal choice
-        
+        self.action = x
+        self.current_state = game.get_state()
         return x  
     
+    def reset(self):
+        """
+        Resets the player's state to the initial state.
+        """
+        self.current_state = None
+        self.action = None
