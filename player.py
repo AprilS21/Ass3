@@ -47,6 +47,39 @@ class RandomComputerPlayer(Player):
     def get_move(self, game):
         square = random.choice(game.available_moves())
         return square
+    def reset(self):
+        """
+        Resets the player's state to the initial state.
+        """
+        self.current_state = None
+        self.action = None
+
+class DefaultComputerPlayer(Player):
+    def __init__(self, letter):
+        super().__init__(letter)
+
+    def get_move(self, game):
+        # Check for winning move or move to prevent opponent winning
+        for possible_move in game.available_moves():
+            game.make_move(possible_move, self.letter)
+            if game.current_winner == self.letter:
+                return possible_move
+            game.make_move(possible_move, 'O' if self.letter == 'X' else 'X')
+            if game.current_winner == ('O' if self.letter == 'X' else 'X'):
+                game.board[possible_move] = ' '  # Undo the move
+                return possible_move
+            game.board[possible_move] = ' '  # Undo the move
+
+        # If no winning move or move to prevent opponent winning, choose randomly
+        square = random.choice(game.available_moves())
+        return square
+
+    def reset(self):
+        """
+        Resets the player's state to the initial state.
+        """
+        self.current_state = None
+        self.action = None
 
 
 class SmartComputerPlayer(Player):
@@ -91,6 +124,12 @@ class SmartComputerPlayer(Player):
                 if sim_score['score'] < best['score']:
                     best = sim_score
         return best
+    def reset(self):
+        """
+        Resets the player's state to the initial state.
+        """
+        self.current_state = None
+        self.action = None
     
 import math
 
@@ -141,9 +180,16 @@ class SmartComputerPlayerPruning(Player):
             if alpha >= beta:  # pruning condition
                 break
         return best
+    def reset(self):
+        """
+        Resets the player's state to the initial state.
+        """
+        self.current_state = None
+        self.action = None
     
 from typing import Dict, List
 import numpy as np
+
 class Qlearning(Player):
     def __init__(self, letter, qtable = None, alpha=0.9, gamma=0.95, q_init=0.6):
         """

@@ -19,6 +19,7 @@ import time
 import tqdm
 from player import *
 
+winner_global =' '
 
 class TicTacToe():
     def __init__(self):
@@ -90,7 +91,8 @@ class TicTacToe():
 
 
 def play(game, x_player, o_player, print_game=True):
-
+    global winner_global
+    winner_global = ' '
     if print_game:
         game.print_board_nums()
 
@@ -110,6 +112,7 @@ def play(game, x_player, o_player, print_game=True):
             if game.current_winner:
                 if print_game:
                     print(letter + ' wins!')
+                winner_global = letter
                 return letter  # ends the loop and exits the game
             letter = 'O' if letter == 'X' else 'X'  # switches player
 
@@ -167,17 +170,54 @@ def load_qtable(file_path='qtable.pkl'):
     with open(file_path, 'rb') as f:
         qtable = pickle.load(f)
     return qtable
+import matplotlib.pyplot as plt
+
+def plot_results(player1_wins, player2_wins, ties):
+    labels = ['Player 1 Wins', 'Player 2 Wins', 'Ties']
+    values = [player1_wins, player2_wins, ties]
+
+    fig, ax = plt.subplots()
+    ax.bar(labels, values, color=['blue', 'green', 'orange'])
+
+    ax.set_xlabel('Results')
+    ax.set_ylabel('Number of Games')
+    ax.set_title('Results of Two Algorithms Playing a Game')
+
+    plt.show()
 
 
 if __name__ == '__main__':
     qtable = load_qtable()
-    x_player = Qlearning('X', qtable)
+    #x_player = Qlearning('X', qtable)
     #o_player = HumanPlayer('O')
-    #o_player = SmartComputerPlayerPruning('O')
+    #x_player = SmartComputerPlayerPruning('X')
+    x_player = RandomComputerPlayer('X')
     o_player = RandomComputerPlayer('O')
+    #o_player = DefaultComputerPlayer('O')
+    #o_player = SmartComputerPlayer('O')
     t = TicTacToe()
     #train_qlearning_model2(100)
-    o_player = HumanPlayer('O')
-    play(t, x_player, o_player, print_game=True)
+    #o_player = HumanPlayer('O')
+    wins_x = 0
+    wins_o =0
+    ties =0
+    #play(t, x_player, o_player, print_game=True)
+    for _ in range(10):
+        play(t, x_player, o_player, print_game=False)
+        #print(winner_global)
+        t = TicTacToe()
+        x_player.reset()
+        o_player.reset()
+        if winner_global == 'X':
+            wins_x += 1
+        elif  winner_global == 'O':
+                wins_o+=1
+        else:
+            ties += 1
+
+    plot_results(wins_x, wins_o, ties)
+
+    
+
 
 
