@@ -1,13 +1,4 @@
-"""
-Tic Tac Toe class + game play implementation by Kylie Ying
-YouTube Kylie Ying: https://www.youtube.com/ycubed 
-Twitch KylieYing: https://www.twitch.tv/kylieying 
-Twitter @kylieyying: https://twitter.com/kylieyying 
-Instagram @kylieyying: https://www.instagram.com/kylieyying/ 
-Website: https://www.kylieying.com
-Github: https://www.github.com/kying18 
-Programmer Beast Mode Spotify playlist: https://open.spotify.com/playlist/4Akns5EUb3gzmlXIdsJkPs?si=qGc4ubKRRYmPHAJAIrCxVQ 
-"""
+# Code based on https://github.com/kying18/tic-tac-toe
 
 from datetime import datetime
 import logging
@@ -169,6 +160,7 @@ def load_qtable(file_path='qtable.pkl'):
     """
     with open(file_path, 'rb') as f:
         qtable = pickle.load(f)
+    print(qtable)
     return qtable
 import matplotlib.pyplot as plt
 
@@ -187,22 +179,20 @@ def plot_results(player1_wins, player2_wins, ties):
 
 
 if __name__ == '__main__':
-    qtable = load_qtable()
-    #x_player = Qlearning('X', qtable)
-    #o_player = HumanPlayer('O')
-    #x_player = SmartComputerPlayerPruning('X')
-    x_player = RandomComputerPlayer('X')
-    o_player = RandomComputerPlayer('O')
-    #o_player = DefaultComputerPlayer('O')
-    #o_player = SmartComputerPlayer('O')
     t = TicTacToe()
-    #train_qlearning_model2(100)
+    o_player = Minimax('O')
+    startTime = time.time()
+    train_qlearning_model2(500)
+    endTime = time.time()
+    print('Time taken for training: ', endTime - startTime)
+    qtable = load_qtable()
+    x_player = Qlearning('X', qtable)
     #o_player = HumanPlayer('O')
     wins_x = 0
     wins_o =0
     ties =0
-    #play(t, x_player, o_player, print_game=True)
-    for _ in range(10):
+    play(t, x_player, o_player, print_game=True)
+    for _ in range(100):
         play(t, x_player, o_player, print_game=False)
         #print(winner_global)
         t = TicTacToe()
