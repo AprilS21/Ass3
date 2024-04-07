@@ -1,4 +1,4 @@
-#Code based on: https://github.com/Weiwei-Wan/AI_Connect4_MiniMax-Q-learning/tree/main
+#Credit: https://github.com/Weiwei-Wan/AI_Connect4_MiniMax-Q-learning/tree/main
 import numpy as np
 
 HEIGHT = 5
@@ -188,5 +188,5 @@ def main():
     #play(player1=miniMaxPrune, player2=defaultPlayer, loopNum=50, trainNum=100000, print_Board=False)
 
     play(player1=defaultPlayer, player2=defaultPlayer, loopNum=2, trainNum=100000, print_Board=True)
-
+    play(player1=miniMaxPrune, player2=defaultPlayer, loopNum=100, trainNum=100000, print_Board=False)
 main()

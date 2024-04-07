@@ -1,4 +1,4 @@
-#Code based on : https://github.com/Weiwei-Wan/AI_Connect4_MiniMax-Q-learning/tree/main
+#Credit: : https://github.com/Weiwei-Wan/AI_Connect4_MiniMax-Q-learning/tree/main
 import pickle
 import numpy as np
 import random
@@ -88,7 +88,6 @@ def miniMaxPruning(the_board, columnHeights, depth, isMax, alpha, beta, state_co
                 new_best = max(best, miniMaxPruning(the_board, columnHeights, depth + 1, not isMax, alpha, beta, state_count))
                 the_board[HEIGHT-int(columnHeights[j])][j] = 0
                 columnHeights[j] -= 1
-                # alpha-beta pruning
                 if new_best > best:
                     best = new_best
                 if best >= beta:
@@ -105,7 +104,6 @@ def miniMaxPruning(the_board, columnHeights, depth, isMax, alpha, beta, state_co
                 new_best = min(best, miniMaxPruning(the_board, columnHeights, depth + 1, not isMax, alpha, beta, state_count))
                 the_board[HEIGHT-int(columnHeights[j])][j] = 0
                 columnHeights[j] -= 1
-                # alpha-beta pruning
                 if new_best < best:
                     best = new_best
                 if best <= alpha:
@@ -153,16 +151,13 @@ def findBestMovePruning(the_board):
     bestMove = -1
     global state_count
     state_count =0
-    # get height map
     columnHeights = np.zeros((WIDTH))
     for j in range(WIDTH):
         for i in range(HEIGHT):
             if the_board[HEIGHT-1-i][j] != 0:
                 columnHeights[j] += 1
-    # find best move
     for j in range(WIDTH):
         if columnHeights[j]<HEIGHT:
-            # move
             columnHeights[j] += 1
             the_board[HEIGHT-int(columnHeights[j])][j] = player
             moveVal = miniMaxPruning(the_board, columnHeights, 0, False, -1000, 1000, state_count)
@@ -179,16 +174,13 @@ def findBestMovePruning(the_board):
 def findBestMove(the_board):
     bestVal = -1000
     bestMove = -1
-    # get height map
     columnHeights = np.zeros((WIDTH))
     for j in range(WIDTH):
         for i in range(HEIGHT):
             if the_board[HEIGHT-1-i][j] != 0:
                 columnHeights[j] += 1
-    # find best move
     for j in range(WIDTH):
         if columnHeights[j]<HEIGHT:
-            # move
             columnHeights[j] += 1
             the_board[HEIGHT-int(columnHeights[j])][j] = player
             moveVal = miniMax(the_board, columnHeights, 0, False)
@@ -205,8 +197,8 @@ LOSS_VALUE = 0.0
 TIED_VALUE = 0.5
 
 alpha=0.9 # learning rate
-gamma=0.95 # discount factor
-q_init=0.6 # init q table
+gamma=0.95 # discount
+initialise=0.6 # inititialise q table
 
 class PlayQlearning():
     def __init__(self, player):
@@ -218,8 +210,6 @@ class PlayQlearning():
             self.opponent = 1
             self.player = 2
 
-
-    # give the np board a special index
     def indexBoard(self, the_board):
         index = ""
         for i in range(HEIGHT):
@@ -231,7 +221,7 @@ class PlayQlearning():
         if board_index in self.QTable:
             value = self.QTable[board_index]
         else:
-            value = q_init*np.ones((WIDTH))
+            value = initialise*np.ones((WIDTH))
             self.QTable[board_index] = value
         return value
     
@@ -246,11 +236,10 @@ class PlayQlearning():
         return True
 
     def findBestMove(self, the_board):
-        # get the max pos
         boardIndex = self.indexBoard(the_board)
         qValue = self.getQValue(boardIndex)
         while True:
-            maxIndex = np.argmax(qValue) # get the max value index
+            maxIndex = np.argmax(qValue)
             if self.checkPosAvaliable(maxIndex, the_board):
                 break
             else:
@@ -270,23 +259,17 @@ class PlayQlearning():
         next_max = -1.0
         for h in self.history:
             qValue = self.getQValue(h[0])
-            if next_max < 0:  # first loop
+            if next_max < 0: 
                 qValue[h[1]] = final_value
             else:
                 qValue[h[1]] = qValue[h[1]] * (1.0-alpha) + alpha * gamma * next_max
 
             next_max = qValue.max()
-            #self.QTable[h[0]] = qValue
     
     def newGame(self):
         self.history = []
 
     def load_qtable(file_path='qtable.pkl'):
-        """
-        Loads the Q-table from a file.
-        :param file_path: The path to the file where the Q-table is stored.
-        :return: The loaded Q-table.
-        """
         with open(file_path, 'rb') as f:
             qtable = pickle.load(f)
         print(qtable)

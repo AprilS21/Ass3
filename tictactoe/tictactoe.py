@@ -1,4 +1,4 @@
-# Code based on https://github.com/kying18/tic-tac-toe
+# Credit: https://github.com/kying18/tic-tac-toe
 
 from datetime import datetime
 import logging
@@ -114,50 +114,35 @@ def play(game, x_player, o_player, print_game=True):
 
 
 
-def train_qlearning_model2(num_games=100):
-    """
-    Trains the Q-learning model by playing a specified number of games.
-    :param num_games: The number of games to play for training.
-    """
+def train_qlearning_model(num_games=100):
     for game_num in range(num_games):
         print(f"Game {game_num + 1}")
         game = TicTacToe()
         winner = play(game, x_player, o_player, print_game=False)
-        # Update Q-table based on the outcome of the game
         if winner == 'X':
             reward = 1
         elif winner == 'O':
             reward = -1
         else:
             reward = 0
-        # Update Q-table for the last move made by the Q-learning player
         last_state = game.get_state()
         last_action = x_player.action
-        # Ensure the last state exists in the Q-table with all possible actions
         if last_state not in x_player.qtable:
-            x_player.qtable[last_state] = {action: 0 for action in range(9)} # Assuming 9 possible actions
-        # Update the Q-value for the last action taken
+            x_player.qtable[last_state] = {action: 0 for action in range(9)} 
         max_future_q = np.max(list(x_player.qtable[last_state].values()))
         current_q = x_player.qtable[last_state][last_action]
         new_q = (1 - x_player.learning_rate) * current_q + x_player.learning_rate * (reward + x_player.value_discount * max_future_q)
         x_player.qtable[last_state][last_action] = new_q
-        # Decay epsilon for exploration vs. exploitation trade-off
         x_player.epsilon *= 0.995
-        # Reset the game and Q-learning player for the next iteration
         game = TicTacToe()
         x_player.reset()
 
-        # Save the Q-table after training
+        # Save the Q-table
     with open('qtable.pkl', 'wb') as f:
         pickle.dump(x_player.qtable, f)
 
 
 def load_qtable(file_path='qtable.pkl'):
-    """
-    Loads the Q-table from a file.
-    :param file_path: The path to the file where the Q-table is stored.
-    :return: The loaded Q-table.
-    """
     with open(file_path, 'rb') as f:
         qtable = pickle.load(f)
     print(qtable)
@@ -181,20 +166,23 @@ def plot_results(player1_wins, player2_wins, ties):
 if __name__ == '__main__':
     t = TicTacToe()
     o_player = Minimax('O')
-    startTime = time.time()
-    train_qlearning_model2(500)
-    endTime = time.time()
-    print('Time taken for training: ', endTime - startTime)
+    #o_player = MinimaxPruning('O')
+    
+    #startTime = time.time()
+    #train_qlearning_model(500)
+    #endTime = time.time()
+    #print('Time taken for training: ', endTime - startTime)
+
     qtable = load_qtable()
     x_player = Qlearning('X', qtable)
-    #o_player = HumanPlayer('O')
+    #o_player = DefaultPlayer('O')
     wins_x = 0
     wins_o =0
     ties =0
     play(t, x_player, o_player, print_game=True)
     for _ in range(100):
         play(t, x_player, o_player, print_game=False)
-        #print(winner_global)
+        print("WINNER" + winner_global)
         t = TicTacToe()
         x_player.reset()
         o_player.reset()
